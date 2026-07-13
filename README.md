@@ -29,6 +29,3 @@ tools.py
 main.py
 ```
 
-## Status
-
-🚧 Under Development
