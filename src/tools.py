@@ -96,3 +96,27 @@ def read_note(filename: str) -> str:
         return "File does not exist."
 
     return path.read_text(encoding="utf-8")
+
+def list_notes() -> str:
+    """
+    List all files in the sandbox.
+    """
+    files = sorted(p.name for p in SANDBOX_DIR.iterdir() if p.is_file())
+
+    if not files:
+        return "No notes found."
+
+    return "\n".join(files)
+
+def current_datetime() -> str:
+    """
+    Return the current date and time.
+    """
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+def word_count(text: str) -> str:
+    """
+    Count the number of words in the given text.
+    """
+    count = len(text.split())
+    return str(count)
