@@ -31,5 +31,42 @@ def _execute_tool_call(name: str, arguments: dict) -> str:
         return fn(**arguments)
 
     #this ** before aguments do dictionary unpacking thing
+    #return immediately returns value to run_agent()
     except Exception as exc:
         return f"Error running {name}: {exc}"
+
+def run_agent(user_input: str) -> str:
+    """Run the local ReAct loop and return the assistant's final answer."""
+
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_input},
+    ]
+
+    #This is saved as list because it remembers the flow of conversation (memory management)
+    # using _ instead of i means we don't care about the loop variable
+    for _ in range(MAX_STEPS):
+
+      response = _client.chat(
+        model=MODEL,
+        messages=messages, 
+        tools=TOOL_FUNCTIONS,
+      )  
+    
+    #right side messages is our variable , left side is what ollama expects
+    #here in respose block , python sends everything to ollama
+      msg = response.message
+
+      messages.append(msg)
+      #appending helps model to remember things that it said , not overwriting 
+      #but it is necessary
+      if not msg.tool_calls:
+        return msg.content or ""
+
+      for call in msg.tool_calls:
+        result = _execute_tool_call(
+            call.function.name,
+            call.function.arguments,
+        )
+
+    #for loop is used because model could request multiple tools
